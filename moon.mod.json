@@ -5,5 +5,5 @@
   "repository": "",
   "license": "Apache-2.0",
   "keywords": [],
-  "description": ""
+  "description": "encoding_rs準拠のShift_JISデコーダー for MoonBit"
 }

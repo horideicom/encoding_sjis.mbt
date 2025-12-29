@@ -12,7 +12,7 @@ encoding_rs準拠のShift_JISデコーダー for MoonBit。
 
 ```moonbit
 [dependencies]
-encoding_sjis_mbt = "{ version = "0.1.0", source = "local" }
+encoding_sjis_mbt = "{ version = \"0.1.0\" }"
 ```
 
 ## 使用例
