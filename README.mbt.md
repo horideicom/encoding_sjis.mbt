@@ -1,0 +1,1 @@
+# f4ah6o/encoding_sjis_mbt
