@@ -21,7 +21,9 @@ test "half_width_katakana" {
 ///|
 test "hiragana" {
   // "あいうえお" in Shift_JIS
-  let input = Bytes::from_array([0x82, 0xA0, 0x82, 0xA2, 0x82, 0xA4, 0x82, 0xA6, 0x82, 0xA8])
+  let input = Bytes::from_array([
+    0x82, 0xA0, 0x82, 0xA2, 0x82, 0xA4, 0x82, 0xA6, 0x82, 0xA8,
+  ])
   let (result, had_replacements) = decode(src=input)
   inspect(result, content="あいうえお")
   inspect(had_replacements, content="false")
@@ -30,7 +32,9 @@ test "hiragana" {
 ///|
 test "katakana" {
   // "アイウエオ" in Shift_JIS
-  let input = Bytes::from_array([0x83, 0x40, 0x83, 0x42, 0x83, 0x44, 0x83, 0x46, 0x83, 0x48])
+  let input = Bytes::from_array([
+    0x83, 0x40, 0x83, 0x42, 0x83, 0x44, 0x83, 0x46, 0x83, 0x48,
+  ])
   let (result, had_replacements) = decode(src=input)
   inspect(result, content="ァィゥェォ")
   inspect(had_replacements, content="false")
@@ -50,8 +54,8 @@ test "mixed" {
   // "Hello 日本語 ｱｲｳ" in Shift_JIS
   let input = Bytes::from_array([
     0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, // "Hello "
-    0x93, 0xFA, 0x96, 0x7B, 0x8C, 0xEA, 0x20, // "日本語 "
-    0xB1, 0xB2, 0xB3 // "ｱｲｳ"
+     0x93, 0xFA, 0x96, 0x7B, 0x8C, 0xEA, 0x20, // "日本語 "
+     0xB1, 0xB2, 0xB3, // "ｱｲｳ"
   ])
   let (result, had_replacements) = decode(src=input)
   inspect(result, content="Hello 日本語 ｱｲｳ")
@@ -91,13 +95,13 @@ test "streaming_split_two_byte" {
 
   // 最初のチャンク（"あ"の1バイト目のみ）
   let chunk1 = Bytes::from_array([0x82])
-  let result1 = decoder.decode_to_string(src=chunk1,false)
+  let result1 = decoder.decode_to_string(src=chunk1, false)
   inspect(result1, content="")
   inspect(decoder.pending_first_byte, content="130") // 0x82 = 130
 
   // 2番目のチャンク（"あ"の2バイト目）
   let chunk2 = Bytes::from_array([0xA0])
-  let result2 = decoder.decode_to_string(src=chunk2,false)
+  let result2 = decoder.decode_to_string(src=chunk2, false)
   inspect(result2, content="あ")
   inspect(decoder.pending_first_byte, content="0")
 }
@@ -107,16 +111,12 @@ test "streaming_multiple_chunks" {
   // 複数のチャンクに分割されたテキスト
   let decoder = new_decoder()
   let mut result = ""
-
   let chunk1 = Bytes::from_array([0x82, 0xA0, 0x82]) // "あ" + "い"の1バイト目
-  result = result + decoder.decode_to_string(src=chunk1,false)
-
+  result = result + decoder.decode_to_string(src=chunk1, false)
   let chunk2 = Bytes::from_array([0xA2, 0x82, 0xA4]) // "い"の2バイト目 + "う"の1バイト目
-  result = result + decoder.decode_to_string(src=chunk2,false)
-
+  result = result + decoder.decode_to_string(src=chunk2, false)
   let chunk3 = Bytes::from_array([0x83, 0x40]) // "う"の2バイト目 + "ア"
-  result = result + decoder.decode_to_string(src=chunk3,true)
-
+  result = result + decoder.decode_to_string(src=chunk3, true)
   inspect(result, content="あいうァ")
   inspect(decoder.had_replacements(), content="false")
 }
@@ -140,7 +140,10 @@ test "decoder_reset" {
 ///|
 test "fullwidth_characters" {
   // 全角文字のテスト（！＂＃＄％＆＇）
-  let input = Bytes::from_array([0x81, 0x49, 0x81, 0x68, 0x81, 0x69, 0x81, 0x6A, 0x81, 0x6B, 0x81, 0x6C, 0x81, 0x6D])
+  let input = Bytes::from_array([
+    0x81, 0x49, 0x81, 0x68, 0x81, 0x69, 0x81, 0x6A, 0x81, 0x6B, 0x81, 0x6C, 0x81,
+    0x6D,
+  ])
   let (result, had_replacements) = decode(src=input)
   inspect(result, content="！”（）〔〕［")
   inspect(had_replacements, content="false")

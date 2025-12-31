@@ -23,6 +23,7 @@ encoding_sjis = "{ version = \"0.1.0\" }"
 ### Simple Decode
 
 ```moonbit
+///|
 test "simple decode" {
   let bytes = [0x82, 0xA0, 0x82, 0xA2, 0x82, 0xA4] // "あいう"
   let (result, had_replacements) = decode(src=bytes)
@@ -34,14 +35,13 @@ test "simple decode" {
 ### Streaming Decode
 
 ```moonbit
+///|
 test "streaming decode" {
   let decoder = new_decoder()
   let chunk1 = [0x82, 0xA0] // "あ"
   let chunk2 = [0x82, 0xA2] // "い"
-
   let result1 = decoder.decode_to_string(src=chunk1, last=false)
   let result2 = decoder.decode_to_string(src=chunk2, last=true)
-
   @test.eq(result1, "あ")
   @test.eq(result2, "い")
 }
@@ -52,16 +52,15 @@ test "streaming decode" {
 The streaming decoder correctly handles multi-byte characters split across chunk boundaries:
 
 ```moonbit
+///|
 test "chunk boundary" {
   let decoder = new_decoder()
-  let chunk1 = [0x82]  // First byte of "あ"
-  let chunk2 = [0xA0]  // Second byte of "あ"
-
+  let chunk1 = [0x82] // First byte of "あ"
+  let chunk2 = [0xA0] // Second byte of "あ"
   let result1 = decoder.decode_to_string(src=chunk1, last=false)
   let result2 = decoder.decode_to_string(src=chunk2, last=true)
-
-  @test.eq(result1, "")      // Incomplete sequence is buffered
-  @test.eq(result2, "あ")    // Completed after second chunk
+  @test.eq(result1, "") // Incomplete sequence is buffered
+  @test.eq(result2, "あ") // Completed after second chunk
 }
 ```
 
@@ -70,11 +69,11 @@ test "chunk boundary" {
 Invalid byte sequences are replaced with U+FFFD:
 
 ```moonbit
+///|
 test "error handling" {
   let bytes = [0x41, 0x80, 0x42] // "A" + invalid + "B"
   let (result, had_replacements) = decode(src=bytes)
-
-  @test.eq(result, "A\ufffdB")  // U+FFFD for invalid byte
+  @test.eq(result, "A\ufffdB") // U+FFFD for invalid byte
   @test.eq(had_replacements, true)
 }
 ```
@@ -82,11 +81,12 @@ test "error handling" {
 ### Mixed Content
 
 ```moonbit
+///|
 test "mixed content" {
   let bytes = [
-    0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20,        // "Hello "
-    0x82, 0xA0, 0x82, 0xA2,                    // "あい"
-    0xB1, 0xB2, 0xB3                           // "ｱｲｳ" (half-width katakana)
+    0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, // "Hello "
+     0x82, 0xA0, 0x82, 0xA2, // "あい"
+     0xB1, 0xB2, 0xB3, // "ｱｲｳ" (half-width katakana)
   ]
   let (result, _) = decode(src=bytes)
   @test.eq(result, "Hello あいｱｲｳ")
@@ -96,6 +96,7 @@ test "mixed content" {
 ### Convenience API
 
 ```moonbit
+///|
 test "shift_jis_to_utf8" {
   let bytes = [0x82, 0xA0, 0x82, 0xA2]
   let result = shift_jis_to_utf8(data=bytes)
