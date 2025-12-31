@@ -1,23 +1,26 @@
 # encoding_sjis_mbt
 
-encoding_rs準拠のShift_JISデコーダー for MoonBit。
+encoding_rs-compliant Shift_JIS decoder for MoonBit.
 
-## 機能
+## Features
 
-* Shift_JISバイト列をUTF-8文字列にデコード
-* ストリーミングデコードAPI（チャンク処理対応）
-* encoding_rs準拠の挙動
+* Shift_JIS to UTF-8 decoding
+* Streaming decode API with chunk boundary support
+* encoding_rs-compliant behavior
+* Character set support: ASCII, half-width katakana, hiragana, katakana, kanji (JIS X 0208)
+* Error handling with replacement character (U+FFFD)
+* Replacement tracking
 
-## インストール
+## Installation
 
 ```moonbit
 [dependencies]
 encoding_sjis_mbt = "{ version = \"0.1.0\" }"
 ```
 
-## 使用例
+## Usage
 
-### シンプルデコード
+### Simple Decode
 
 ```moonbit
 test "simple decode" {
@@ -28,7 +31,7 @@ test "simple decode" {
 }
 ```
 
-### ストリーミングデコード
+### Streaming Decode
 
 ```moonbit
 test "streaming decode" {
@@ -44,7 +47,53 @@ test "streaming decode" {
 }
 ```
 
-### 簡易API
+### Chunk Boundary Handling
+
+The streaming decoder correctly handles multi-byte characters split across chunk boundaries:
+
+```moonbit
+test "chunk boundary" {
+  let decoder = new_decoder()
+  let chunk1 = [0x82]  // First byte of "あ"
+  let chunk2 = [0xA0]  // Second byte of "あ"
+
+  let result1 = decoder.decode_to_string(src=chunk1, last=false)
+  let result2 = decoder.decode_to_string(src=chunk2, last=true)
+
+  @test.eq(result1, "")      // Incomplete sequence is buffered
+  @test.eq(result2, "あ")    // Completed after second chunk
+}
+```
+
+### Error Handling
+
+Invalid byte sequences are replaced with U+FFFD:
+
+```moonbit
+test "error handling" {
+  let bytes = [0x41, 0x80, 0x42] // "A" + invalid + "B"
+  let (result, had_replacements) = decode(src=bytes)
+
+  @test.eq(result, "A\ufffdB")  // U+FFFD for invalid byte
+  @test.eq(had_replacements, true)
+}
+```
+
+### Mixed Content
+
+```moonbit
+test "mixed content" {
+  let bytes = [
+    0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20,        // "Hello "
+    0x82, 0xA0, 0x82, 0xA2,                    // "あい"
+    0xB1, 0xB2, 0xB3                           // "ｱｲｳ" (half-width katakana)
+  ]
+  let (result, _) = decode(src=bytes)
+  @test.eq(result, "Hello あいｱｲｳ")
+}
+```
+
+### Convenience API
 
 ```moonbit
 test "shift_jis_to_utf8" {
@@ -56,20 +105,74 @@ test "shift_jis_to_utf8" {
 
 ## API
 
-### `decode(src: Bytes) -> (String, Bool)`
+### Functions
 
-Shift_JISバイト列をUTF-8文字列にデコードします（非ストリーミング）。
+#### `decode(src: Bytes) -> (String, Bool)`
 
-* 戻り値: (デコードされた文字列, 置換文字が使用されたかどうか)
+Decodes a Shift_JIS byte sequence to a UTF-8 string (non-streaming).
 
-### `new_decoder() -> Decoder`
+* Returns: (decoded string, whether replacement characters were used)
 
-ストリーミングデコード用の新しいデコーダーを作成します。
+#### `new_decoder() -> Decoder`
 
-### `shift_jis_to_utf8(data: Bytes) -> String`
+Creates a new decoder for streaming decode operations.
 
-Shift_JISバイト列をUTF-8文字列に変換する簡易API。
+#### `shift_jis_to_utf8(data: Bytes) -> String`
 
-## ライセンス
+Convenience API that decodes Shift_JIS bytes to UTF-8 string.
+Does not return replacement information (compatible with jww_parser API).
+
+### Decoder Methods
+
+#### `Decoder::decode_to_string(src: Bytes, last: Bool) -> String`
+
+Decodes a chunk of Shift_JIS bytes to UTF-8 string.
+
+* `src`: Input byte chunk
+* `last`: Set `true` for the final chunk (flushes any pending incomplete sequence)
+* Returns: Decoded string
+
+#### `Decoder::reset() -> Unit`
+
+Resets the decoder state, clearing any pending bytes and replacement flags.
+
+#### `Decoder::had_replacements() -> Bool`
+
+Returns whether replacement characters (U+FFFD) have been used during decoding.
+
+### Types
+
+#### `Decoder`
+
+Stateful decoder for streaming operations.
+
+* `pending_first_byte`: Stores the first byte of an incomplete 2-byte sequence
+* `had_replacements`: Tracks if replacement characters were used
+
+#### `DecodeResult`
+
+Result of a decode operation (for future buffer-based API).
+
+* `result`: `CoderResult` - operation status
+* `read`: Number of bytes read
+* `written`: Number of UTF-8 code units written
+* `had_replacements`: Whether replacement characters were used
+
+#### `CoderResult`
+
+Result status for streaming operations.
+
+* `InputEmpty`: Input exhausted (normal completion or waiting for more data)
+* `OutputFull`: Output buffer full (for future buffer-based API)
+
+## Supported Character Sets
+
+* ASCII (0x00-0x7F)
+* Half-width Katakana (0xA1-0xDF) → U+FF61-U+FF9F
+* Hiragana (0x82A0-0x82F1)
+* Full-width Katakana (0x8340-0x8396, 0x83AA-0x83EF, etc.)
+* Kanji and symbols (JIS X 0208 compliant)
+
+## License
 
 Apache-2.0
