@@ -15,7 +15,7 @@ encoding_rs-compliant Shift_JIS decoder for MoonBit.
 
 ```moonbit
 [dependencies]
-encoding_sjis = "{ version = \"0.1.0\" }"
+horideicom/encoding_sjis = "{ version = \"0.1.0\" }"
 ```
 
 ## Usage
