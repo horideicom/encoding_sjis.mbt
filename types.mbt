@@ -4,6 +4,7 @@
 ///|
 /// ストリーミングデコード操作の結果
 /// encoding_rsのCoderResultに相当
+#warnings("-unused_constructor")
 pub enum CoderResult {
   /// 入力が使い果たされた（正常終了または継続待ち）
   InputEmpty
@@ -13,6 +14,7 @@ pub enum CoderResult {
 
 ///|
 /// デコード操作の結果
+#warnings("-struct_never_constructed")
 pub struct DecodeResult {
   /// 処理結果
   result : CoderResult
