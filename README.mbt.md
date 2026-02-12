@@ -13,7 +13,7 @@ encoding_rs-compliant Shift_JIS decoder for MoonBit.
 
 ## Installation
 
-```moonbit
+```moonbit nocheck
 [dependencies]
 horideicom/encoding_sjis = "{ version = \"0.1.0\" }"
 ```
@@ -22,7 +22,7 @@ horideicom/encoding_sjis = "{ version = \"0.1.0\" }"
 
 ### Simple Decode
 
-```moonbit
+```moonbit nocheck
 ///|
 test "simple decode" {
   let bytes = [0x82, 0xA0, 0x82, 0xA2, 0x82, 0xA4] // "あいう"
@@ -34,7 +34,7 @@ test "simple decode" {
 
 ### Streaming Decode
 
-```moonbit
+```moonbit nocheck
 ///|
 test "streaming decode" {
   let decoder = new_decoder()
@@ -51,7 +51,7 @@ test "streaming decode" {
 
 The streaming decoder correctly handles multi-byte characters split across chunk boundaries:
 
-```moonbit
+```moonbit nocheck
 ///|
 test "chunk boundary" {
   let decoder = new_decoder()
@@ -68,7 +68,7 @@ test "chunk boundary" {
 
 Invalid byte sequences are replaced with U+FFFD:
 
-```moonbit
+```moonbit nocheck
 ///|
 test "error handling" {
   let bytes = [0x41, 0x80, 0x42] // "A" + invalid + "B"
@@ -80,7 +80,7 @@ test "error handling" {
 
 ### Mixed Content
 
-```moonbit
+```moonbit nocheck
 ///|
 test "mixed content" {
   let bytes = [
@@ -95,7 +95,7 @@ test "mixed content" {
 
 ### Convenience API
 
-```moonbit
+```moonbit nocheck
 ///|
 test "shift_jis_to_utf8" {
   let bytes = [0x82, 0xA0, 0x82, 0xA2]

@@ -1,0 +1,7 @@
+import {
+  "horideicom/encoding_sjis" @lib,
+}
+
+options(
+  "is-main": true,
+)
