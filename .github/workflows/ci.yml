@@ -1,0 +1,34 @@
+name: MoonBit CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  moonbit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: Update package index
+        run: moon update
+
+      - name: Check formatting
+        run: moon fmt --check
+
+      - name: Check all targets
+        run: moon check --target all --frozen
+
+      - name: Test all targets
+        run: moon test --target all --frozen
+
+      - name: Verify generated interfaces
+        run: |
+          moon info
+          git diff --exit-code -- pkg.generated.mbti cmd/main/pkg.generated.mbti

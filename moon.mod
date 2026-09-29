@@ -1,0 +1,13 @@
+name = "f4ah6o/encoding_sjis"
+
+version = "0.1.1"
+
+readme = "README.mbt.md"
+
+repository = "https://github.com/horideicom/encoding_sjis.mbt"
+
+license = "Apache-2.0"
+
+keywords = [ ]
+
+description = "encoding_rs-compliant Shift_JIS decoder for MoonBit"

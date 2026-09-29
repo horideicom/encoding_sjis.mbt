@@ -5,7 +5,7 @@
 ///|
 /// 新しいデコーダーを作成
 pub fn Decoder::new() -> Decoder {
-  { pending_first_byte: 0, had_replacements: false }
+  { pending_first_byte: 0, had_replacements: false, }
 }
 
 ///|
@@ -29,7 +29,11 @@ pub fn Decoder::had_replacements(self : Decoder) -> Bool {
 ///   - last: 最後のチャンクかどうか（falseの場合、不完全なシーケンスを次回に持ち越し）
 ///
 /// 戻り値: デコードされた文字列
-pub fn Decoder::decode_to_string(self : Decoder, src~ : Bytes, last : Bool) -> String {
+pub fn Decoder::decode_to_string(
+  self : Decoder,
+  src~ : Bytes,
+  last : Bool,
+) -> String {
   let mut result = ""
   let mut i = 0
   let len = src.length()
@@ -46,11 +50,11 @@ pub fn Decoder::decode_to_string(self : Decoder, src~ : Bytes, last : Bool) -> S
     } else {
       let b1 = self.pending_first_byte
       let b2 = src[0].to_int()
-      let valid_second = (b2 >= 0x40 && b2 <= 0xFC) && (b2 != 0x7F)
+      let valid_second = (b2 >= 0x40 && b2 <= 0xFC) && b2 != 0x7F
 
       if valid_second {
         let code = (b1 << 8) | b2
-        match decode_jis_x_0208(code=code) {
+        match decode_jis_x_0208(code~) {
           Some(ch) => result = result + ch.to_string()
           None => {
             result = result + '\uFFFD'.to_string()
@@ -87,11 +91,11 @@ pub fn Decoder::decode_to_string(self : Decoder, src~ : Bytes, last : Bool) -> S
       if i + 1 < len {
         // 同じチャンク内に2バイト目がある
         let b2 = src[i + 1].to_int()
-        let valid_second = (b2 >= 0x40 && b2 <= 0xFC) && (b2 != 0x7F)
+        let valid_second = (b2 >= 0x40 && b2 <= 0xFC) && b2 != 0x7F
 
         if valid_second {
           let code = (b1 << 8) | b2
-          match decode_jis_x_0208(code=code) {
+          match decode_jis_x_0208(code~) {
             Some(ch) => result = result + ch.to_string()
             None => {
               result = result + '\uFFFD'.to_string()

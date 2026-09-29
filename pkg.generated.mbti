@@ -1,0 +1,52 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "f4ah6o/encoding_sjis"
+
+// Values
+pub fn decode(src~ : Bytes) -> (String, Bool)
+
+pub fn decode_half_width_katakana(byte~ : Int) -> Char
+
+pub fn decode_jis_x_0208(code~ : Int) -> Char?
+
+pub fn new_decoder() -> Decoder
+
+pub fn shift_jis_to_utf8(data~ : Bytes) -> String
+
+// Errors
+
+// Types and methods
+pub enum CoderResult {
+  InputEmpty
+  OutputFull
+} derive(Eq)
+pub fn CoderResult::equal(Self, Self) -> Bool
+pub fn CoderResult::not_equal(Self, Self) -> Bool
+pub fn CoderResult::output(Self, &Logger) -> Unit
+pub fn CoderResult::to_string(Self) -> String
+pub impl Show for CoderResult
+
+pub struct DecodeResult {
+  result : CoderResult
+  read : Int
+  written : Int
+  had_replacements : Bool
+}
+pub fn DecodeResult::output(Self, &Logger) -> Unit
+pub fn DecodeResult::to_string(Self) -> String
+pub impl Show for DecodeResult
+
+pub struct Decoder {
+  mut pending_first_byte : Int
+  mut had_replacements : Bool
+}
+pub fn Decoder::decode_to_string(Self, src~ : Bytes, Bool) -> String
+pub fn Decoder::had_replacements(Self) -> Bool
+pub fn Decoder::new() -> Self
+pub fn Decoder::output(Self, &Logger) -> Unit
+pub fn Decoder::reset(Self) -> Unit
+pub fn Decoder::to_string(Self) -> String
+pub impl Show for Decoder
+
+// Type aliases
+
+// Traits

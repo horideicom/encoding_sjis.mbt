@@ -8,7 +8,7 @@
 /// 戻り値: (デコードされた文字列, 置換文字が使用されたかどうか)
 pub fn decode(src~ : Bytes) -> (String, Bool) {
   let decoder = new_decoder()
-  let result = decoder.decode_to_string(src=src, true)
+  let result = decoder.decode_to_string(src~, true)
   (result, decoder.had_replacements())
 }
 

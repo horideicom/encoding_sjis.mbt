@@ -1,0 +1,10 @@
+# Keep package archives focused on sources and user-facing documentation.
+/.DS_Store
+/.githooks/
+/.github/
+/.moonagent/
+/.mooncakes/
+/AGENTS.md
+/target/
+/pkg.generated.mbti
+/cmd/main/pkg.generated.mbti
